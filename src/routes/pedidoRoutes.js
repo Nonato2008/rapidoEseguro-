@@ -8,6 +8,6 @@ router.post("/pedidos", pedidoController.criarPedido);
 
 router.delete("/pedidos/:idPedido", pedidoController.deletarPedido);
 
-router.put("/pedidos/:idPedido", pedidoController.atualizarpedido);
+router.put("/pedidos/:idPedido", pedidoController.atualizarPedido);
 
 module.exports = { pedidoRoutes: router }

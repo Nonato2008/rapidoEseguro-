@@ -1,4 +1,3 @@
-const { query } = require("mssql");
 const { sql, getConnection } = require("../config/db")
 
 const pedidoModel = {
@@ -12,7 +11,7 @@ const pedidoModel = {
             const querySQL = `
             SELECT 
                 PD.idPedido,
-                CL.idCLiente,
+                CL.idCliente,
                 PD.dataPedido,
                 PD.tipoEntregaPedido,
                 PD.distanciaPedido,
@@ -44,10 +43,10 @@ const pedidoModel = {
             
             const pool = await getConnection();
 
-            const querySQL = "SELECT * FROM Pedidos WHERE idPedido = @idPedido"
+            const querySQL = "SELECT * FROM PEDIDOS WHERE idPedido = @idPedido";
 
             const result = await pool.request()
-                .input("idProduto", sql.UniqueIdentifier, idPedido)
+                .input("idPedido", sql.UniqueIdentifier, idPedido)
                 .query(querySQL);
 
             return result.recordset;
@@ -79,8 +78,8 @@ const pedidoModel = {
                 .input("tipoEntregaPedido", sql.VarChar(7), tipoEntregaPedido)
                 .input("distanciaPedido", sql.Int, distanciaPedido)
                 .input("pesoPedido", sql.Int, pesoPedido)
-                .input("valorBaseKmPedido", sql.Decimal(10.2), valorBaseKmPedido)
-                .input("valorBaseKgPedido", sql.Decimal(10.2), valorBaseKgPedido)
+                .input("valorBaseKmPedido", sql.Decimal(10,2), valorBaseKmPedido)
+                .input("valorBaseKgPedido", sql.Decimal(10,2), valorBaseKgPedido)
                 .query(querySQL)
 
             
@@ -90,6 +89,42 @@ const pedidoModel = {
             console.error("Erro ao inserir pedido", error)
             throw error;
         }
+    },
+
+    atualizarPedido: async (idPedido, idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido) => {
+        
+        try {
+            const pool = await getConnection();
+
+            const querySQL = `
+            UPDATE PEDIDOS
+            SET idCliente = @idCliente,
+                dataPedido = @dataPedido,
+                tipoEntregaPedido = @tipoEntregaPedido, 
+                distanciaPedido = @distanciaPedido,
+                pesoPedido = @pesoPedido,
+                valorBaseKmPedido = @valorBaseKmPedido,
+                valorBaseKgPedido = @valorBaseKgPedido
+            WHERE idPedido = @idPedido
+            `
+
+            await pool.request()
+
+                .input("idCliente", sql.UniqueIdentifier, idCliente)
+                .input("dataPedido", sql.Date, dataPedido)
+                .input("tipoEntregaPedido", sql.VarChar(7), tipoEntregaPedido)
+                .input("distanciaPedido", sql.Int, distanciaPedido)
+                .input("pesoPedido", sql.Int, pesoPedido)
+                .input("valorBaseKmPedido", sql.Decimal(10,2), valorBaseKmPedido)
+                .input("valorBaseKgPedido", sql.Decimal(10,2), valorBaseKgPedido)
+                .input("idPedido", sql.UniqueIdentifier, idPedido)
+                .query(querySQL)
+                
+        } catch (error) {
+            console.error("Erro ao inserir pedido", error)
+            throw error;
+        }
+
     },
 
     deletarPedido: async (idPedido) => {
@@ -109,15 +144,6 @@ const pedidoModel = {
                 .input("idPedido", sql.UniqueIdentifier, idPedido)
                 .query(querySQL);
 
-            querySQL = `
-                DELETE FROM PEDIDOS
-                WHERE idPedido = @idPedido
-            `
-
-            await transaction.request()
-                .input("idPedido", sql.UniqueIdentifier, idPedido)
-                .query(querySQL);
-
             await transaction.commit();
         } catch (error) {
             await transaction.rollback();
@@ -126,40 +152,32 @@ const pedidoModel = {
         }
     },
 
-    atualizarPedido: async (idPedido, idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido) => {
-        try {
+    calculoValorPedido: async (valorBaseKgPedido,valorBaseKmPedido,distanciaPedido,pesoPedido, tipoEntregaPedido) => {
+        
+        const pool = await getConnection();
 
-            const pool = await getConnection();
+        let valorTotalPeso = valorBaseKgPedido * pesoPedido;
 
-            const querySQL = `
-            UPDATE PEDIDOS
-            SET idCliente = @idCliente,
-                dataPedido = @dataPedido,
-                tipoEntregaPedido = @tipoEntregaPedido,
-                distanciaPedido = @distanciaPedido,
-                pesoPedido = @pesoPedido,
-                valorBaseKmPedido = @valorBaseKmPedido,
-                valorBaseKgPedido = @valorBaseKgPedido
-            WHERE idPedido = @idPedido
-        `
+        let valorTotalDistancia = valorBaseKmPedido * distanciaPedido;
 
-            await pool.request()
-                .input('idCliente', sql.UniqueIdentifier, idCliente)
-                .input('dataPedido', sql.Date, dataPedido)
-                .input('tipoEntregaPedido', sql.VarChar(7), tipoEntregaPedido)
-                .input('distanciaPedido', sql.Int, distanciaPedido)
-                .input('pesoPedido', sql.Int, pesoPedido)
-                .input('valorBaseKmPedido', sql.Decimal(10.2), valorBaseKmPedido)
-                .input('valorBaseKgPedido', sql.Decimal(10.2), valorBaseKgPedido)
-                .input('idPedido', sql.UniqueIdentifier, idPedido)
-                .query(querySQL);
+        let valorTotal = valorTotalPeso + valorTotalDistancia;
 
-        } catch (error) {
-            console.error("Erro ao atualizar cliente:", error);
-            throw error;
+        let acrescimo
+
+        let valorTotalAcrescimo
+
+        if(tipoEntregaPedido == urgente){
+            acrescimo = valorTotal * 0,2
+
+            valorTotalAcrescimo = valorTotal + acrescimo
+        }
+
+        if(valorTotal > 500 || valorTotalAcrescimo > 500){
+            
         }
     }
-
 }
+
+
 
 module.exports = {pedidoModel}
