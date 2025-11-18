@@ -34,9 +34,10 @@ const clienteModel = {
 
             const querySQL = `SELECT * FROM  Clientes WHERE idCliente = @idCliente`;
 
-            const result = await pool.request()
-            .input (`idCliente`, sql.UniqueIdentifier, idCliente)
-            .query(querySQL);
+            const result = await pool
+                .request()
+                .input ('idCliente', sql.UniqueIdentifier, idCliente)
+                .query(querySQL);
 
             return result.recordset;
         } catch (error) {
