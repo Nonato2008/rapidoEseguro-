@@ -180,23 +180,23 @@ const pedidoController = {
         try {
             const { idPedido } = req.params;
 
-            if (idPedido.length != 36) {
-                return res.status(400).json({ erro: "id do pedido inválido" });
+            if (!idPedido || idPedido.length !== 36) {
+                return res.status(400).json({ erro: "ID do pedido inválido!" });
             }
 
             const pedido = await pedidoModel.buscarUm(idPedido);
-
+    
             if (!pedido || pedido.length !== 1) {
-                return res.status(400).json({ erro: "Pedido não encontrado!" });
+                return res.status(404).json({ erro: "Pedido não encontrado!" });
             }
 
             await pedidoModel.deletarPedido(idPedido);
-
-            res.status(200).json({ mensagem: "pedido deletado com sucesso!" });
-
+    
+            return res.status(200).json({ mensagem: "Pedido e entrega deletados com sucesso!" });
+    
         } catch (error) {
             console.error("Erro ao deletar pedido:", error);
-            res.status(500).json({ erro: "Erro interno no servidor ao deletar pedido!" });
+            return res.status(500).json({ erro: "Erro interno no servidor ao deletar pedido!" });
         }
     }
 }

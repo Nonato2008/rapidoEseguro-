@@ -175,15 +175,37 @@ const pedidoModel = {
         try {
 
             let querySQL = `
+                SELECT idEntrega 
+                FROM ENTREGAS 
+                WHERE idPedido = @idPedido
+            `;
+
+            const resultadoEntrega = await transaction.request()
+                .input("idPedido", sql.UniqueIdentifier, idPedido)
+                .query(querySQL);
+
+            const idEntrega = resultadoEntrega.recordset[0].idEntrega;
+
+            querySQL = `
+                DELETE FROM ENTREGAS
+                WHERE idEntrega = @idEntrega
+            `;
+
+            await transaction.request()
+                .input("idEntrega", sql.UniqueIdentifier, idEntrega)
+                .query(querySQL);
+
+            querySQL = `
                 DELETE FROM PEDIDOS
                 WHERE idPedido = @idPedido
-            `
+            `;
 
             await transaction.request()
                 .input("idPedido", sql.UniqueIdentifier, idPedido)
                 .query(querySQL);
 
             await transaction.commit();
+
         } catch (error) {
             await transaction.rollback();
             console.error("Erro ao deletar Pedido:", error);
