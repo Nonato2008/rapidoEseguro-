@@ -7,6 +7,7 @@ const clienteModel = {
      * 
      * @async
      * @function buscarTodos
+     * 
      * @returns {Promise<Array>}Retorna uma lista com todos os clientes.
      * @throws Mostra no console e propaga o erro caso a busca falhe.
      */
@@ -28,6 +29,16 @@ const clienteModel = {
         }
     },
 
+    /**
+     * Busca por um cliente em específico e seus respectivos itens
+     * 
+     * @async
+     * @function buscarUm
+     * 
+     * @returns {Promise<Array>}Retorna o cliente procurado na requisição
+     * @throws Mostra no console e propaga o erro caso a busca falhe.
+     */
+
     buscarUm: async (idCliente) =>{
         try {
             const pool = await getConnection();
@@ -45,6 +56,22 @@ const clienteModel = {
             throw error;
         }
     },
+
+    /**
+     * Adiciona um cliente e suas informações
+     * 
+     * @async
+     * @function inserirCliente
+     * 
+     * @param {string} nomeCliente 
+     * @param {string} cpfCliente 
+     * @param {string} emailCliente 
+     * @param {string} telefoneCliente 
+     * @param {string} enderecoCliente 
+     * 
+     * @returns Retorna uma mensagem de sucesso na operação
+     * @throws Mostra no console e propaga o erro caso a busca falhe.
+     */
 
     inserirCliente: async (nomeCliente, cpfCliente, emailCliente, telefoneCliente, enderecoCliente) =>{
 
@@ -71,6 +98,17 @@ const clienteModel = {
 
     },
 
+    /**
+     * Verifica se o cpf já esta inserido no sistema
+     * 
+     * @async
+     * @function verificarCPF
+     * 
+     * @param {string} cpfCliente 
+     * @returns Retorna uma mensagem de que o cpf informado já existe
+     * @throws Mostra no console e propaga o erro caso a busca falhe.
+     */
+
     verificarCPF: async (cpfCliente) => {
         try {
             const pool = await getConnection();
@@ -87,6 +125,18 @@ const clienteModel = {
             throw error;
         }
     },
+
+
+    /**
+     * Verifica se o telefone já esta inserido no sistema
+     * 
+     * @async
+     * @function verificarTelefone
+     * 
+     * @param {string} telefoneCliente 
+     * @returns Retorna uma mensagem de que o telefone informado já existe
+     * @throws Mostra no console e propaga o erro caso a busca falhe.
+     */
 
     verificarTelefone: async (telefoneCliente) => {
         try {
@@ -106,6 +156,18 @@ const clienteModel = {
         }
     },
 
+    /**
+     * Verifica se o email já esta inserido no sistema
+     * 
+     * @async
+     * @function verificarEmail
+     * 
+     * @param {string} emailCliente
+     * 
+     * @returns Retorna uma mensagem de que o email informado já existe
+     * @throws Mostra no console e propaga o erro caso a busca falhe.
+     */
+
     verificarEmail: async (emailCliente) => {
         try {
             const pool = await getConnection();
@@ -123,6 +185,18 @@ const clienteModel = {
             throw error;
         }
     },
+
+    /**
+     * Deleta um cliente existente
+     * 
+     * @async
+     * @function deletarCliente
+     * 
+     * @param {number} idCliente 
+     * 
+     * @returns Retorna uma mensagem de que a exclusão foi sucedida com sucesso
+     * @throws Mostra no console e propaga o erro caso a busca falhe.
+     */
 
     deletarCliente: async (idCliente) => {
 
@@ -157,6 +231,23 @@ const clienteModel = {
             throw error;
         }
     },
+
+    /**
+     * Atualiza um cliente existente
+     * 
+     * @async
+     * @function atualizarCliente
+     * 
+     * @param {number} idCliente 
+     * @param {string} nomeCliente
+     * @param {string} cpfCliente
+     * @param {string} emailCliente
+     * @param {string} telefoneCliente
+     * @param {string} enderecoCliente
+     * 
+     * @returns Retorna uma mensagem de que a exclusão foi sucedida com sucesso
+     * @throws Mostra no console e propaga o erro caso a busca falhe.
+     */
 
     atualizarCliente: async (idCliente, nomeCliente, cpfCliente, emailCliente, telefoneCliente, enderecoCliente) => {
         try {

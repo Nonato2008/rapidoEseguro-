@@ -57,7 +57,7 @@ const pedidoModel = {
         }
     },
 
-    inserirPedidos: async (idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido ) => {
+    inserirPedidos: async (idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido,idPedido, valorDistanciaEntrega, valorPesoEntrega, valorFinalEntrega, acrescimoEntrega,descontoEntrega, taxaExtraEntrega, statusEntrega ) => {
 
         const pool = await getConnection();
 
@@ -71,7 +71,7 @@ const pedidoModel = {
             OUTPUT INSERTED.idPedido
             VALUES (@idCliente, @dataPedido, @tipoEntregaPedido, @distanciaPedido, @pesoPedido, @valorBaseKmPedido, @valorBaseKgPedido)
             `
-
+            
             const result = await transaction.request()
                 .input("idCliente", sql.UniqueIdentifier, idCliente)
                 .input("dataPedido", sql.Date, dataPedido)
@@ -80,7 +80,44 @@ const pedidoModel = {
                 .input("pesoPedido", sql.Int, pesoPedido)
                 .input("valorBaseKmPedido", sql.Decimal(10,2), valorBaseKmPedido)
                 .input("valorBaseKgPedido", sql.Decimal(10,2), valorBaseKgPedido)
+                .query(querySQL);
+
+            querySQL = `
+            INSERT INTO ENTREGAS(
+                idPedido,
+                valorDistanciaEntrega,
+                valorPesoEntrega,
+                valorFinalEntrega,
+                acrescimoEntrega,
+                descontoEntrega,
+                taxaExtraEntrega,
+                statusEntrega
+                )
+            OUTPUT INSERTED.idEntrega
+            VALUES(
+                @idPedido,
+                @valorDistanciaEntrega,
+                @valorPesoEntrega,
+                @valorFinalEntrega,
+                @acrescimoEntrega,
+                @descontoEntrega,
+                @taxaExtraEntrega,
+                @statusEntrega
+            )
+            `
+
+            result = await transaction.request()
+                .input("idPedido", sql.UniqueIdentifier, idPedido)
+                .input("valorDistanciaEntrega", sql.Decimal(10,2), valorDistanciaEntrega)
+                .input("valorPesoEntrega", sql.Decimal(10,2), valorPesoEntrega)
+                .input("valorFinalEntrega", sql.Decimal(10,2), valorFinalEntrega)
+                .input("acrescimoEntrega", sql.Decimal(10,2), acrescimoEntrega)
+                .input("descontoEntrega", sql.Decimal(10,2), descontoEntrega)
+                .input("taxaExtraEntrega", sql.Decimal(10,2), taxaExtraEntrega)
+                .input("statusEntrega", sql.Decimal(10,2), statusEntrega)
                 .query(querySQL)
+
+
 
             
             await transaction.commit(); 

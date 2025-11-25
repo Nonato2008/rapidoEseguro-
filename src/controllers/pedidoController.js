@@ -35,7 +35,16 @@ const pedidoController = {
         
         try{
 
-            const { idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido } = req.body
+            const { idCliente,
+                dataPedido,
+                tipoEntregaPedido,
+                distanciaPedido,
+                pesoPedido, 
+                valorBaseKmPedido, 
+                valorBaseKgPedido,  
+                descontoEntrega,
+                taxaExtraEntrega
+                 } = req.body
 
  
 
@@ -62,7 +71,31 @@ const pedidoController = {
                 return res.status(404).json({erro: "Cliente não encontrado"})
             }  
 
-            await pedidoModel.inserirPedidos( idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido);
+            valorDistanciaEntrega = distanciaPedido * valorBaseKmPedido
+
+            valorPesoEntrega = pesoPedido * valorBaseKgPedido
+
+            valorFinalEntrega = valorPesoEntrega + valorDistanciaEntrega
+
+
+            
+            if(tipoEntregaPedido == "urgente".toLowerCase()){
+                acrescimoEntrega = (valorFinalEntrega * 0.2)
+
+                valorFinalEntrega = valorFinalEntrega + acrescimoEntrega
+
+            } 
+
+            if(valorFinalEntrega > 500){
+                descontoEntrega = (valorFinalEntrega * 0.1) + valorFinalEntrega
+            }
+
+            if(pesoPedido > 50){
+                taxaExtraEntrega = valorFinalEntrega + 15
+            }
+
+
+            await pedidoModel.inserirPedidos( idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido, valorDistanciaEntrega, valorPesoEntrega, valorFinalEntrega, acrescimoEntrega, descontoEntrega, taxaExtraEntrega);
 
             res.status(201).json({ message: "Pedido cadastrado com sucesso!"});
         }catch (error) {

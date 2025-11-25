@@ -4,14 +4,14 @@ const { clienteModel } = require("../models/clienteModel")
 const clienteController = {
 
     /**
-     * Controlador que lista todos os clientes do banco de dados.
+     * Controlador que cria novos clientes
      * 
      * @async
-     * @function listarClientes
-     * @param {objetct} req - Objeto da requisição (recebido do cliente HTTP)
-     * @param {object} res - Objeto da resposta (enviado ao cliente HTTP)
-     * @returns {Promise<void>} Retorna uma resposta JSON com a lista de clientes.
-     * @throws Mostra no console e retorna erro 500 se ocorrer falha ao buscar os clientes.
+     * @function criarCliente
+     * @param {object} req Objeto da requisição (recebido do cliente HTTP)
+     * @param {object} res Objeto da resposta (enviado ao cliente HTTP)
+     * @returns {Promise<void>} Retorna uma resposta JSON de que o cliente foi inserido com sucesso.
+     * @returns 
      */
 
     criarCliente: async (req, res) => {
@@ -67,6 +67,17 @@ const clienteController = {
         }
 
     },
+
+    /**
+     * Controlador que lista todos os clientes do banco de dados.
+     * 
+     * @async
+     * @function listarClientes
+     * @param {objetct} req - Objeto da requisição (recebido do cliente HTTP)
+     * @param {object} res - Objeto da resposta (enviado ao cliente HTTP)
+     * @returns {Promise<void>} Retorna uma resposta JSON com a lista de clientes.
+     * @throws Mostra no console e retorna erro 500 se ocorrer falha ao buscar os clientes.
+     */
 
     listarClientes: async (req, res) => {
         try {
