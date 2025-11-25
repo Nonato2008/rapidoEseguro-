@@ -1,4 +1,5 @@
 type: collection.insomnia.rest/5.0
+schema_version: "5.1"
 name: rapidoESeguroDB
 meta:
   id: wrk_5d4c2158b5ca45aa9d4f957fed05fac4
@@ -10,7 +11,7 @@ collection:
     meta:
       id: fld_d4d97cc6df59463f8e122f9b3f8d1f30
       created: 1762877651395
-      modified: 1762877651395
+      modified: 1764071231882
       sortKey: -1762877651395
       description: ""
     children:
@@ -66,8 +67,7 @@ collection:
               sortKey: -1762877678464
             method: GET
             parameters:
-              - id: pair_9d9e15b349a849489fbf2019d0f537d5
-                name: idCliente
+              - name: idCliente
                 value: 1FF7178B-3ABD-4219-8539-5E43A0B1A02D
                 description: ""
                 disabled: true
@@ -92,12 +92,6 @@ collection:
               description: ""
               sortKey: -1762882444133
             method: DELETE
-            parameters:
-              - id: pair_a4332de14e104198ba17f68e08531c8f
-                name: ""
-                value: ""
-                description: ""
-                disabled: false
             headers:
               - name: User-Agent
                 value: insomnia/12.0.0
@@ -179,7 +173,7 @@ collection:
             meta:
               id: req_13f9a7f6967241069656cfdb2acd9966
               created: 1763466529188
-              modified: 1763479440557
+              modified: 1764096296260
               isPrivate: false
               description: ""
               sortKey: -1763466529188
@@ -190,11 +184,12 @@ collection:
                 {
                 	"idCliente": "E1350CB3-61F5-417A-893A-8DB046591357",
                 	"dataPedido": "02/02/02",
-                	"tipoEntregaPedido": "Normal",
-                	"distanciaPedido": 10,
-                	"pesoPedido": 1000,
+                	"tipoEntregaPedido": "normal",
+                	"distanciaPedido": 10000000,
+                	"pesoPedido": 10000000,
                 	"valorBaseKmPedido": 3,
-                	"valorBaseKgPedido": 3
+                	"valorBaseKgPedido": 3,
+                	"statusEntrega": "em transito"
                 }
             headers:
               - name: Content-Type
@@ -209,12 +204,12 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: localhost:8081pedidos/EA3ACED0-C1A7-451D-8192-62ABD7722286
+          - url: localhost:8081/pedidos/8FBD6A5B-CDC4-4DFA-9010-53A28004247D
             name: Deletar Pedido
             meta:
               id: req_1e99897f11634727b47e72aade4f4aac
               created: 1763479028510
-              modified: 1763479463506
+              modified: 1763490881194
               isPrivate: false
               description: ""
               sortKey: -1763479028510
@@ -230,12 +225,12 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: localhost:8081/pedidos/EA3ACED0-C1A7-451D-8192-62ABD7722286
+          - url: localhost:8081/pedidos/F6D74655-6B14-4EC0-A985-5961495E1233
             name: Atualizar Pedido
             meta:
               id: req_d2f7bd8f458b4914a4c6b5531c298319
               created: 1763479030391
-              modified: 1763480016688
+              modified: 1764096114540
               isPrivate: false
               description: ""
               sortKey: -1763479030391
@@ -245,16 +240,45 @@ collection:
               text: |-
                 {
                 	"idCliente": "E1350CB3-61F5-417A-893A-8DB046591357",
-                	"dataPedido": "02/22/02",
+                	"dataPedido": "2052-02-02T00:00:00.000Z",
                 	"tipoEntregaPedido": "Urgente",
-                	"distanciaPedido": 120,
-                	"pesoPedido": 190,
+                	"distanciaPedido": 1999999,
+                	"pesoPedido": 99999999999,
                 	"valorBaseKmPedido": 223,
                 	"valorBaseKgPedido": 22
                 }
             headers:
               - name: Content-Type
                 value: application/json
+              - name: User-Agent
+                value: insomnia/12.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: Entregas
+        meta:
+          id: fld_59e87c1846024f799d835e9b588c63b4
+          created: 1764071244267
+          modified: 1764071248244
+          sortKey: -1762877675395
+          description: ""
+        children:
+          - url: localhost:8081/entregas
+            name: Listar Entregas
+            meta:
+              id: req_c2790bcfeef84c2ea7cad91e6ebe6b2e
+              created: 1764071256262
+              modified: 1764072684754
+              isPrivate: false
+              description: ""
+              sortKey: -1764071256262
+            method: GET
+            headers:
               - name: User-Agent
                 value: insomnia/12.0.0
             settings:

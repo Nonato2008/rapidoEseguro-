@@ -105,11 +105,11 @@ const pedidoController = {
             if(valorFinalEntrega > 500){
                 descontoEntrega = (valorFinalEntrega * 0.1)
 
-                valorFinalEntrega = valorFinalEntrega  - descontoEntrega
+                valorFinalEntrega = descontoEntrega
             }
 
             if(pesoPedido > 50){
-                valorFinalEntrega = valorFinalEntrega + taxaExtraEntrega
+                taxaExtraEntrega = valorFinalEntrega + 15
             }
 
             

@@ -7,9 +7,20 @@ const entregaModel = {
             const pool = await getConnection();
 
             const querySQL = `
-            SELECT *
-            FROM ENTREGAS
-            `;
+            SELECT 
+                ET.idEntrega,
+                PD.idPedido,
+                PD.tipoEntregaPedido,
+                ET.valorDistanciaEntrega,
+                ET.valorPesoEntrega,
+                ET.descontoEntrega,
+                ET.acrescimoEntrega,
+                ET.taxaExtraEntrega,
+                ET.valorFinalEntrega,
+                ET.statusEntrega
+            FROM ENTREGAS ET
+            INNER JOIN PEDIDOS PD
+            ON PD.idPedido = ET.idPedido`;
 
             const result = await pool.request().query(querySQL);
 
@@ -17,7 +28,7 @@ const entregaModel = {
             return result.recordset;
         } catch (error) {
 
-            cosnole.error("Erro ao buscar pedidos", error);
+            console.error("Erro ao buscar pedidos", error);
             throw error;
         }
     },
@@ -29,7 +40,8 @@ const entregaModel = {
             const querySQL = `
             SELECT 
                 ET.idEntrega,
-                pd.idPedido,
+                PD.idPedido,
+                PD.tipoEntregaPedido,
                 ET.valorDistanciaEntrega,
                 ET.valorPesoEntrega,
                 ET.descontoEntrega,
@@ -39,7 +51,7 @@ const entregaModel = {
                 ET.statusEntrega
             FROM ENTREGAS ET
             INNER JOIN PEDIDOS PD
-            ON PD.idPedido = pd.idPedido
+            ON PD.idPedido = ET.idPedido
             WHERE ET.idEntrega = @idEntrega;`;
 
             const result = await pool.request()
@@ -49,7 +61,7 @@ const entregaModel = {
             return result.recordset;
 
         } catch (error) {
-            console.error("Errao buscar pedidos", error);
+            console.error("Erro ao buscar pedidos", error);
             throw error;
         }
     }

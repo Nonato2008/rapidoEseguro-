@@ -54,3 +54,32 @@
     "mensagem": "Cliente deletado com sucesso!"
 }
 ```
+
+### PEDIDOS
+
+### GET /pedidos
+
+- **Descrição**: Obtém uma lista de pedidos
+- **Response**: Array de pedidos
+
+#### POST /pedidos
+- **Descrição**: Cria um novo pedido e uma nova entrega
+- **Body**:
+```
+{
+	"idCliente": "00000000000000000000000000000000000",
+	"dataPedido": "DD/MM/YYYY",
+	"tipoEntregaPedido": "exemplo",
+	"distanciaPedido": 0000,
+	"pesoPedido": 0000,
+	"valorBaseKmPedido": 0,
+	"valorBaseKgPedido": 0,
+	"statusEntrega": "status exemplo"
+}
+```
+- **Response**:
+```
+{
+    "message": "Pedido cadastrado com sucesso!"
+}
+```
