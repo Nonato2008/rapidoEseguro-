@@ -80,6 +80,6 @@
 - **Response**:
 ```
 {
-    "message": "Pedido cadastrado com sucesso!"
+    "message": "Pedido e Entrega cadastrado com sucesso!"
 }
 ```

@@ -121,7 +121,7 @@ const pedidoController = {
 
             await pedidoModel.inserirPedidos( idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido, valorDistanciaEntrega, valorPesoEntrega, valorFinalEntrega, acrescimoEntrega, descontoEntrega, taxaExtraEntrega, statusEntrega);
 
-            res.status(201).json({ message: "Pedido cadastrado com sucesso!"});
+            res.status(201).json({ message: "Pedido e Entrega cadastrado com sucesso!"});
         }catch (error) {
             console.error("Erro ao cadastrar pedido:", error)
             res.status(500).json({message: "Erro interno no servidor ao cadastrar pedido!"});
