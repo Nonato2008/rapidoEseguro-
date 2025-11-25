@@ -1,11 +1,11 @@
 const { sql, getConnection } = require("../config/db")
 
 const pedidoModel = {
-    
+
     buscarTodos: async () => {
 
         try {
-            
+
             const pool = await getConnection();
 
             const querySQL = `
@@ -30,17 +30,17 @@ const pedidoModel = {
 
 
         } catch (error) {
-            
+
             console.error("Erro ao buscar pedidos", error);
             throw error;
 
         }
-        
+
     },
 
     buscarUm: async (idPedido) => {
         try {
-            
+
             const pool = await getConnection();
 
             const querySQL = "SELECT * FROM PEDIDOS WHERE idPedido = @idPedido";
@@ -57,7 +57,7 @@ const pedidoModel = {
         }
     },
 
-    inserirPedidos: async (idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido,idPedido, valorDistanciaEntrega, valorPesoEntrega, valorFinalEntrega, acrescimoEntrega,descontoEntrega, taxaExtraEntrega, statusEntrega ) => {
+    inserirPedidos: async (idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido, valorDistanciaEntrega, valorPesoEntrega, valorFinalEntrega, acrescimoEntrega, descontoEntrega, taxaExtraEntrega, statusEntrega) => {
 
         const pool = await getConnection();
 
@@ -65,7 +65,7 @@ const pedidoModel = {
         await transaction.begin();
 
         try {
-            
+
             let querySQL = `
             INSERT INTO Pedidos (idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido)
             OUTPUT INSERTED.idPedido
@@ -78,11 +78,13 @@ const pedidoModel = {
                 .input("tipoEntregaPedido", sql.VarChar(7), tipoEntregaPedido)
                 .input("distanciaPedido", sql.Int, distanciaPedido)
                 .input("pesoPedido", sql.Int, pesoPedido)
-                .input("valorBaseKmPedido", sql.Decimal(10,2), valorBaseKmPedido)
-                .input("valorBaseKgPedido", sql.Decimal(10,2), valorBaseKgPedido)
+                .input("valorBaseKmPedido", sql.Decimal(10, 2), valorBaseKmPedido)
+                .input("valorBaseKgPedido", sql.Decimal(10, 2), valorBaseKgPedido)
                 .query(querySQL);
 
-            querySQL = `
+            
+            const idPedido = result.recordset[0].idPedido;
+                querySQL = `
             INSERT INTO ENTREGAS(
                 idPedido,
                 valorDistanciaEntrega,
@@ -93,7 +95,6 @@ const pedidoModel = {
                 taxaExtraEntrega,
                 statusEntrega
                 )
-            OUTPUT INSERTED.idEntrega
             VALUES(
                 @idPedido,
                 @valorDistanciaEntrega,
@@ -106,21 +107,22 @@ const pedidoModel = {
             )
             `
 
-            result = await transaction.request()
+
+            await transaction.request()
                 .input("idPedido", sql.UniqueIdentifier, idPedido)
-                .input("valorDistanciaEntrega", sql.Decimal(10,2), valorDistanciaEntrega)
-                .input("valorPesoEntrega", sql.Decimal(10,2), valorPesoEntrega)
-                .input("valorFinalEntrega", sql.Decimal(10,2), valorFinalEntrega)
-                .input("acrescimoEntrega", sql.Decimal(10,2), acrescimoEntrega)
-                .input("descontoEntrega", sql.Decimal(10,2), descontoEntrega)
-                .input("taxaExtraEntrega", sql.Decimal(10,2), taxaExtraEntrega)
-                .input("statusEntrega", sql.Decimal(10,2), statusEntrega)
+                .input("valorDistanciaEntrega", sql.Decimal(10, 2), valorDistanciaEntrega)
+                .input("valorPesoEntrega", sql.Decimal(10, 2), valorPesoEntrega)
+                .input("valorFinalEntrega", sql.Decimal(10, 2), valorFinalEntrega)
+                .input("acrescimoEntrega", sql.Decimal(10, 2), acrescimoEntrega)
+                .input("descontoEntrega", sql.Decimal(10, 2), descontoEntrega)
+                .input("taxaExtraEntrega", sql.Decimal(10, 2), taxaExtraEntrega)
+                .input("statusEntrega", sql.VarChar(12), statusEntrega)
                 .query(querySQL)
 
 
 
-            
-            await transaction.commit(); 
+
+            await transaction.commit();
         } catch (error) {
             await transaction.rollback();
             console.error("Erro ao inserir pedido", error)
@@ -129,7 +131,7 @@ const pedidoModel = {
     },
 
     atualizarPedido: async (idPedido, idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido) => {
-        
+
         try {
             const pool = await getConnection();
 
@@ -147,16 +149,16 @@ const pedidoModel = {
 
             await pool.request()
 
+                .input("idPedido", sql.UniqueIdentifier, idPedido)
                 .input("idCliente", sql.UniqueIdentifier, idCliente)
                 .input("dataPedido", sql.Date, dataPedido)
                 .input("tipoEntregaPedido", sql.VarChar(7), tipoEntregaPedido)
                 .input("distanciaPedido", sql.Int, distanciaPedido)
                 .input("pesoPedido", sql.Int, pesoPedido)
-                .input("valorBaseKmPedido", sql.Decimal(10,2), valorBaseKmPedido)
-                .input("valorBaseKgPedido", sql.Decimal(10,2), valorBaseKgPedido)
-                .input("idPedido", sql.UniqueIdentifier, idPedido)
+                .input("valorBaseKmPedido", sql.Decimal(10, 2), valorBaseKmPedido)
+                .input("valorBaseKgPedido", sql.Decimal(10, 2), valorBaseKgPedido)
                 .query(querySQL)
-                
+
         } catch (error) {
             console.error("Erro ao inserir pedido", error)
             throw error;
@@ -187,34 +189,9 @@ const pedidoModel = {
             console.error("Erro ao deletar Pedido:", error);
             throw error;
         }
-    },
-
-    calculoValorPedido: async (valorBaseKgPedido,valorBaseKmPedido,distanciaPedido,pesoPedido, tipoEntregaPedido) => {
-        
-        const pool = await getConnection();
-
-        let valorTotalPeso = valorBaseKgPedido * pesoPedido;
-
-        let valorTotalDistancia = valorBaseKmPedido * distanciaPedido;
-
-        let valorTotal = valorTotalPeso + valorTotalDistancia;
-
-        let acrescimo
-
-        let valorTotalAcrescimo
-
-        if(tipoEntregaPedido == urgente){
-            acrescimo = valorTotal * 0,2
-
-            valorTotalAcrescimo = valorTotal + acrescimo
-        }
-
-        if(valorTotal > 500 || valorTotalAcrescimo > 500){
-            
-        }
     }
 }
 
 
 
-module.exports = {pedidoModel}
+module.exports = { pedidoModel }

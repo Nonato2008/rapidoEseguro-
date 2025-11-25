@@ -41,9 +41,8 @@ const pedidoController = {
                 distanciaPedido,
                 pesoPedido, 
                 valorBaseKmPedido, 
-                valorBaseKgPedido,  
-                descontoEntrega,
-                taxaExtraEntrega
+                valorBaseKgPedido,
+                statusEntrega
                  } = req.body
 
  
@@ -71,31 +70,56 @@ const pedidoController = {
                 return res.status(404).json({erro: "Cliente não encontrado"})
             }  
 
-            valorDistanciaEntrega = distanciaPedido * valorBaseKmPedido
+        
+            let valorDistanciaEntrega = distanciaPedido * valorBaseKmPedido
 
-            valorPesoEntrega = pesoPedido * valorBaseKgPedido
+            let valorPesoEntrega = pesoPedido * valorBaseKgPedido
 
-            valorFinalEntrega = valorPesoEntrega + valorDistanciaEntrega
+            let  valorFinalEntrega = valorPesoEntrega + valorDistanciaEntrega
 
+            let  acrescimoEntrega = 0
+
+            let taxaExtraEntrega = 15
+
+            let descontoEntrega = 0 
+
+           
 
             
             if(tipoEntregaPedido == "urgente".toLowerCase()){
-                acrescimoEntrega = (valorFinalEntrega * 0.2)
+               acrescimoEntrega = (valorFinalEntrega * 0.2)
 
                 valorFinalEntrega = valorFinalEntrega + acrescimoEntrega
+                
+                if(pesoPedido > 50){
+                 valorFinalEntrega = valorFinalEntrega + taxaExtraEntrega
+            }
 
+                if(valorFinalEntrega > 500){
+                descontoEntrega = (valorFinalEntrega * 0.1)
+
+                valorFinalEntrega = valorFinalEntrega  - descontoEntrega
+            }
             } 
 
             if(valorFinalEntrega > 500){
-                descontoEntrega = (valorFinalEntrega * 0.1) + valorFinalEntrega
+                descontoEntrega = (valorFinalEntrega * 0.1)
+
+                valorFinalEntrega = valorFinalEntrega  - descontoEntrega
             }
 
             if(pesoPedido > 50){
-                taxaExtraEntrega = valorFinalEntrega + 15
+                valorFinalEntrega = valorFinalEntrega + taxaExtraEntrega
+            }
+
+            
+
+            if (statusEntrega !== "calculado".toLowerCase() && statusEntrega !== "em transito".toLowerCase() && statusEntrega !== "entregue".toLowerCase() && statusEntrega != "cancelado".toLowerCase() && statusEntrega == undefined) {
+                return res.status(404).json({erro: "Status Inválido"})
             }
 
 
-            await pedidoModel.inserirPedidos( idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido, valorDistanciaEntrega, valorPesoEntrega, valorFinalEntrega, acrescimoEntrega, descontoEntrega, taxaExtraEntrega);
+            await pedidoModel.inserirPedidos( idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido, valorDistanciaEntrega, valorPesoEntrega, valorFinalEntrega, acrescimoEntrega, descontoEntrega, taxaExtraEntrega, statusEntrega);
 
             res.status(201).json({ message: "Pedido cadastrado com sucesso!"});
         }catch (error) {

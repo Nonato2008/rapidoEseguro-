@@ -11,8 +11,8 @@ const entregaModel = {
             FROM ENTREGAS
             `;
 
-            const result = await pool.request().query(sql);
-               
+            const result = await pool.request().query(querySQL);
+
 
             return result.recordset;
         } catch (error) {
@@ -26,7 +26,21 @@ const entregaModel = {
 
             const pool = await getConnection();
 
-            const querySQL = "SELECT * FROM ENTREGAS WHERE idEnrega = @idEntrega";
+            const querySQL = `
+            SELECT 
+                ET.idEntrega,
+                pd.idPedido,
+                ET.valorDistanciaEntrega,
+                ET.valorPesoEntrega,
+                ET.descontoEntrega,
+                ET.acrescimoEntrega,
+                ET.taxaExtraEntrega,
+                ET.valorFinalEntrega,
+                ET.statusEntrega
+            FROM ENTREGAS ET
+            INNER JOIN PEDIDOS PD
+            ON PD.idPedido = pd.idPedido
+            WHERE ET.idEntrega = @idEntrega;`;
 
             const result = await pool.request()
                 .input("idEntrega".sql.UniqueIdentifier, idEntrega)
@@ -38,43 +52,7 @@ const entregaModel = {
             console.error("Errao buscar pedidos", error);
             throw error;
         }
-    },
-
-    inserirEntrega: async (idPedido, valorDistanciaEntrega, valorPesoEntrega, descontoEntrega, acrescimoEntrega, taxaEntrega, valorFinalEntrega, statusEntrega) =>{
-
-        const pool = await getConnection();
-
-        const transaction = new sql.Transaction(pool);
-        await transaction.begin();
-
-        try {
-
-            let querySQL = `
-            INSERT INTO ENTREGAS(idPedido, valorDistanciaEntrega, valorPesoEntrega, descontoEntrega, acrescimoEntrega, taxaExtraEntrega, valorFinalEntrega, statusEntrega)
-            OUTPUT INSERTED.idEntrega
-            VALUES(@acrescimoEntrega, @taxaEntrega, @valorFinalEntrega, @statusEntrega)
-            `
-
-            const result = await transaction.request()
-            .input("idPedido", sql.UniqueIdentifier, idPedido)
-            .input("valorDistanciaEntrega", sql.Decimal(10,2), valorDistanciaEntrega)
-            .input("valorPesoEntrega", sql.Decimal(10,2), valorPesoEntrega)
-            .input("descontoEntrega", sql.Decimal(10,2), descontoEntrega)
-            .input("acrescimoEntrega", sql.Decimal(10,2), acrescimoEntrega)
-            .input("taxaExtraEntrega", sql.Decimal(10,2), taxaEntrega)
-            .input("valorFinalEntrega", sql.Decimal(10,2), valorFinalEntrega)
-            .input("statusEntrega", sql.VarChar(12), statusEntrega)
-            .query(querySQL)
-
-            await transaction.commit(); 
-            
-        } catch (error) {
-            await transaction.rollback();
-            console.error("Erro ao inserir pedido", error)
-            throw error;
-        }
     }
-
 }
 
-module.exports = {entregaModel}
+module.exports = { entregaModel }
