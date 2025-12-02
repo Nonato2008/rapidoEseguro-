@@ -1,3 +1,4 @@
+const { UniqueIdentifier } = require("mssql");
 const { sql, getConnection } = require("../config/db")
 
 const entregaModel = {
@@ -55,7 +56,7 @@ const entregaModel = {
             WHERE ET.idEntrega = @idEntrega;`;
 
             const result = await pool.request()
-                .input("idEntrega".sql.UniqueIdentifier, idEntrega)
+                .input("idEntrega", UniqueIdentifier, idEntrega)
                 .query(querySQL);
 
             return result.recordset;

@@ -109,12 +109,12 @@ const pedidoController = {
             }
 
             if(pesoPedido > 50){
-                taxaExtraEntrega = valorFinalEntrega + 15
+                valorFinalEntrega = valorFinalEntrega + taxaExtraEntrega
             }
 
             
 
-            if (statusEntrega !== "calculado".toLowerCase() && statusEntrega !== "em transito".toLowerCase() && statusEntrega !== "entregue".toLowerCase() && statusEntrega != "cancelado".toLowerCase() && statusEntrega == undefined) {
+             if (statusEntrega.toLowerCase() !== "calculado" && statusEntrega.toLowerCase() !== "em transito" && statusEntrega.toLowerCase() !== "entregue" && statusEntrega.toLowerCase() != "cancelado" && statusEntrega == undefined) {
                 return res.status(404).json({erro: "Status Inválido"})
             }
 
@@ -132,7 +132,7 @@ const pedidoController = {
    atualizarPedido: async (req, res) => {
         try {
             const {idPedido} = req.params;
-            const {idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido} = req.body;
+            const {idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido, statusEntrega} = req.body;
 
             if(idPedido.length != 36){
                 return res.status(400).json({errp: "id do pedido inválido!"})
@@ -156,7 +156,7 @@ const pedidoController = {
                 }
             }
 
-             const pedidoAtual = pedido[0];
+            const pedidoAtual = pedido[0];
 
             const idClienteAtualizado  = idCliente ?? pedidoAtual.idCliente;
             const dataPedidoAtualizado =  dataPedido ?? pedidoAtual.dataPedido;
@@ -165,14 +165,69 @@ const pedidoController = {
             const pesoPedidoAtualizado = pesoPedido ?? pedidoAtual.pesoPedido;
             const valorBaseKmPedidoAtualizado = valorBaseKmPedido ?? pedidoAtual.valorBaseKmPedido;
             const valorBaseKgPedidoAtualizado = valorBaseKgPedido ?? pedidoAtual.valorBaseKgPedido;
+            const statusEntregaAtualizado = statusEntrega ?? pedidoAtual.statusEntrega;
 
-            await pedidoModel.atualizarPedido(idPedido, idClienteAtualizado, dataPedidoAtualizado, tipoEntregaPedidoAtualizado, distanciaPedidoAtualizado, pesoPedidoAtualizado, valorBaseKmPedidoAtualizado, valorBaseKgPedidoAtualizado);
+            //ATUALIZAR ENTREGA
 
-            res.status(200).json({message: "Pedido atualizado com sucesso!"});
+            valorDistanciaEntrega = distanciaPedido * valorBaseKmPedido
+
+            valorPesoEntrega = pesoPedido * valorBaseKgPedido
+
+            valorFinalEntrega = valorPesoEntrega + valorDistanciaEntrega
+
+            acrescimoEntrega = 0
+
+            taxaExtraEntrega = 0
+
+            descontoEntrega = 0 
+
+           
+
+            
+            if(tipoEntregaPedido == "urgente".toLowerCase()){
+               acrescimoEntrega = (valorFinalEntrega * 0.2)
+
+                valorFinalEntrega = valorFinalEntrega + acrescimoEntrega
+                
+                if(pesoPedido > 50){
+                 valorFinalEntrega = valorFinalEntrega + taxaExtraEntrega
+            }
+
+                if(valorFinalEntrega > 500){
+                descontoEntrega = (valorFinalEntrega * 0.1)
+
+                valorFinalEntrega = valorFinalEntrega  - descontoEntrega
+            }
+            } 
+
+            if(valorFinalEntrega > 500){
+                descontoEntrega = (valorFinalEntrega * 0.1)
+
+                valorFinalEntrega = descontoEntrega
+            }
+
+            if(pesoPedido > 50){
+
+                taxaExtraEntrega = taxaExtraEntrega + 15
+                valorFinalEntrega = valorFinalEntrega + taxaExtraEntrega
+            }
+
+            
+
+            if (statusEntrega.toLowerCase() !== "calculado" && statusEntrega.toLowerCase() !== "em transito" && statusEntrega.toLowerCase() !== "entregue" && statusEntrega.toLowerCase() != "cancelado" && statusEntrega == undefined) {
+                return res.status(404).json({erro: "Status Inválido"})
+            }
+
+            const idEntrega = pedidoAtual.idEntrega
+            
+
+            await pedidoModel.atualizarPedido(idPedido, idClienteAtualizado, dataPedidoAtualizado, tipoEntregaPedidoAtualizado, distanciaPedidoAtualizado, pesoPedidoAtualizado, valorBaseKmPedidoAtualizado, valorBaseKgPedidoAtualizado, valorDistanciaEntrega, valorPesoEntrega, descontoEntrega, acrescimoEntrega, taxaExtraEntrega, valorFinalEntrega, statusEntregaAtualizado);
+
+            res.status(200).json({message: "Pedido e entrega atualizado com sucesso!"});
 
         } catch (error) {
             console.error("Erro ao atualizar pedido:", error)
-            res.status(500).json({message: "Erro interno no servidor ao atualizar pedido!"});
+            res.status(500).json({message: "Erro interno no servidor ao atualizar pedido e entrga!"});
         }
    },
 

@@ -26,18 +26,7 @@ const entregaController = {
             console.error("Erro ao listar entregas:", error);
             res.status(500).json({ erro: "Erro interno no servidor ao listar entregas!" });
         }
-    },
-
-    inserirEntrega: async (req, res) => {
-        try {
-            const {} = req.body
-
-            
-        } catch (error) {
-            
-        }
     }
-
 }
 
 module.exports = { entregaController }

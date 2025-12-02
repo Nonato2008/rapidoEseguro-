@@ -1,5 +1,7 @@
 const { getConnection } = require("../config/db");
-const { clienteModel } = require("../models/clienteModel")
+const { clienteModel } = require("../models/clienteModel");
+const {pedidoModel} = require("../models/pedidoModel");
+const {entregaModel} = require("../models/entregaModel");
 
 const clienteController = {
 
@@ -105,7 +107,7 @@ const clienteController = {
 
     deletarCliente: async (req, res) => {
         try {
-            const { idCliente } = req.params;
+            const { idCliente, idPedido, idEntrega } = req.params;
 
             if (idCliente.length != 36) {
                 return res.status(400).json({ erro: "id do cliente inválido" });
@@ -115,6 +117,13 @@ const clienteController = {
 
             if (!cliente || cliente.length !== 1) {
                 return res.status(400).json({ erro: "Cliente não encontrado!" });
+            }
+
+            const pedido = await pedidoModel.buscarUm(idPedido)
+            const entrega = await entregaModel.buscarUm(idEntrega)
+
+            if(pedido.length > 0 || entrega.length > 0){
+                return res.status(409).json({message: "Entrega e pedido na conta, pague ou cancele vagabundo!!!🥚"});
             }
 
             await clienteModel.deletarCliente(idCliente);

@@ -125,17 +125,17 @@ const pedidoModel = {
             await transaction.commit();
         } catch (error) {
             await transaction.rollback();
-            console.error("Erro ao inserir pedido", error)
+            console.error("Erro ao inserir pedidoe e entrega", error)
             throw error;
         }
     },
 
-    atualizarPedido: async (idPedido, idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido) => {
+    atualizarPedido: async (idPedido, idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido, valorDistanciaEntrega, valorPesoEntrega, descontoEntrega, acrescimoEntrega, taxaExtraEntrega, valorFinalEntrega, statusEntrega ) => {
 
         try {
             const pool = await getConnection();
 
-            const querySQL = `
+            let querySQL = `
             UPDATE PEDIDOS
             SET idCliente = @idCliente,
                 dataPedido = @dataPedido,
@@ -159,8 +159,34 @@ const pedidoModel = {
                 .input("valorBaseKgPedido", sql.Decimal(10, 2), valorBaseKgPedido)
                 .query(querySQL)
 
+            querySQL = `
+            UPDATE ENTREGAS
+            SET 
+                valorDistanciaEntrega = @valorDistanciaEntrega,
+                valorPesoEntrega = @valorPesoEntrega,
+                descontoEntrega = @descontoEntrega,
+                acrescimoEntrega = @acrescimoEntrega,
+                taxaExtraEntrega = @taxaExtraEntrega,
+                valorFinalEntrega = @valorFinalEntrega,
+                statusEntrega = @statusEntrega
+            WHERE idPedido = idPedido
+            `
+            await pool.request()
+
+                .input("idPedido", sql.UniqueIdentifier, idPedido)
+                .input("idCliente", sql.UniqueIdentifier, idCliente)
+                .input("tipoEntregaPedido", sql.VarChar(7), tipoEntregaPedido)
+                .input("valorDistanciaEntrega", sql.Decimal(10,2), valorDistanciaEntrega)
+                .input("valorPesoEntrega", sql.Decimal(10,2), valorPesoEntrega)
+                .input("descontoEntrega", sql.Decimal(10,2), descontoEntrega)
+                .input("acrescimoEntrega", sql.Decimal(10,2), acrescimoEntrega)
+                .input("taxaExtraEntrega", sql.Decimal(10,2), taxaExtraEntrega)
+                .input("valorFinalEntrega", sql.Decimal(10,2), valorFinalEntrega)
+                .input("statusEntrega", sql.VarChar(12), statusEntrega)
+                .query(querySQL)
+
         } catch (error) {
-            console.error("Erro ao inserir pedido", error)
+            console.error("Erro ao atualizar pedido", error)
             throw error;
         }
 

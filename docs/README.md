@@ -12,7 +12,7 @@
 - **Body**:
 ```
 {
-    "nomeProduto": "clienteExemplo",
+    "nomeCliente": "clienteExemplo",
     "cpfCliente": "00000000000",
     "emailCliente": "exemplo@gmail.com",
     "telefoneCliente": "000000000000",
