@@ -52,6 +52,10 @@ const clienteController = {
                 return res.status(409).json({ erro: "Número já existente!" });
             }
 
+            if(nomeCliente == " " || cpfCliente == " " || emailCliente == " " || telefoneCliente == " " || enderecoCliente == " " ){
+                return res.status(409).json({ erro: "Por favor preencha os campos" });
+            }
+
             const resultEmail = await clienteModel.verificarEmail(emailCliente);
 
             if (resultEmail.length > 0) {
@@ -180,6 +184,7 @@ const clienteController = {
             if (!cliente || cliente.length != 1) {
                 return res.status(404).json({ erro: 'Cliente não encontrado!' })
             }
+
 
             const clienteAtual = cliente[0];
 

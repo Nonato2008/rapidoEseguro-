@@ -117,7 +117,7 @@ const pedidoModel = {
             OUTPUT INSERTED.idPedido
             VALUES (@idCliente, @dataPedido, @tipoEntregaPedido, @distanciaPedido, @pesoPedido, @valorBaseKmPedido, @valorBaseKgPedido)
             `
-            
+
             const result = await transaction.request()
                 .input("idCliente", sql.UniqueIdentifier, idCliente)
                 .input("dataPedido", sql.Date, dataPedido)
@@ -128,9 +128,9 @@ const pedidoModel = {
                 .input("valorBaseKgPedido", sql.Decimal(10, 2), valorBaseKgPedido)
                 .query(querySQL);
 
-            
+
             const idPedido = result.recordset[0].idPedido;
-                querySQL = `
+            querySQL = `
             INSERT INTO ENTREGAS(
                 idPedido,
                 valorDistanciaEntrega,
@@ -202,22 +202,32 @@ const pedidoModel = {
      * @throws Mostra no console e propaga o erro caso a busca falhe.
      */
 
-    atualizarPedido: async (idPedido, idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido, valorDistanciaEntrega, valorPesoEntrega, descontoEntrega, acrescimoEntrega, taxaExtraEntrega, valorFinalEntrega, statusEntrega ) => {
+    atualizarPedido: async (idPedido, idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido, valorDistanciaEntrega, valorPesoEntrega, descontoEntrega, acrescimoEntrega, taxaExtraEntrega, valorFinalEntrega, statusEntrega) => {
 
         try {
             const pool = await getConnection();
 
+         
+            const campos = [];
+
+            campos.push("idCliente = @idCliente")
+            campos.push("dataPedido = @dataPedido")
+            campos.push("tipoEntregaPedido = @tipoEntregaPedido")
+            campos.push("distanciaPedido = @distanciaPedido")
+            campos.push("pesoPedido = @pesoPedido")
+            campos.push("valorBaseKmPedido = @valorBaseKmPedido")
+            campos.push("valorBaseKgPedido = @valorBaseKgPedido")
+
+            if (campos.length === 0) {
+                console.log("Nenhum campo para atualizar.");
+                return;
+            }
+
             let querySQL = `
-            UPDATE PEDIDOS
-            SET idCliente = @idCliente,
-                dataPedido = @dataPedido,
-                tipoEntregaPedido = @tipoEntregaPedido, 
-                distanciaPedido = @distanciaPedido,
-                pesoPedido = @pesoPedido,
-                valorBaseKmPedido = @valorBaseKmPedido,
-                valorBaseKgPedido = @valorBaseKgPedido
-            WHERE idPedido = @idPedido
-            `
+                UPDATE Pedidos
+                SET ${campos.join(", ")}
+                WHERE idPedido = @idPedido
+                `;
 
             await pool.request()
 
@@ -231,29 +241,36 @@ const pedidoModel = {
                 .input("valorBaseKgPedido", sql.Decimal(10, 2), valorBaseKgPedido)
                 .query(querySQL)
 
-            querySQL = `
-            UPDATE ENTREGAS
-            SET 
-                valorDistanciaEntrega = @valorDistanciaEntrega,
-                valorPesoEntrega = @valorPesoEntrega,
-                descontoEntrega = @descontoEntrega,
-                acrescimoEntrega = @acrescimoEntrega,
-                taxaExtraEntrega = @taxaExtraEntrega,
-                valorFinalEntrega = @valorFinalEntrega,
-                statusEntrega = @statusEntrega
-            WHERE idPedido = idPedido
-            `
-            await pool.request()
+            
+            const entregaCampos = [];
 
+            entregaCampos.push("valorDistanciaEntrega = @valorDistanciaEntrega")
+            entregaCampos.push("valorPesoEntrega = @valorPesoEntrega")
+            entregaCampos.push("descontoEntrega = @descontoEntrega")
+            entregaCampos.push("acrescimoEntrega = @acrescimoEntrega")
+            entregaCampos.push("taxaExtraEntrega = @taxaExtraEntrega")
+            entregaCampos.push("valorFinalEntrega = @valorFinalEntrega")
+            entregaCampos.push("statusEntrega = @statusEntrega")
+
+            if (entregaCampos.length === 0) {
+                console.log("Nenhum campo para atualizar.");
+                return;
+            }
+
+            querySQL = `
+                UPDATE ENTREGAS
+                SET ${entregaCampos.join(", ")}
+                WHERE idPedido = @idPedido
+                `;
+
+            await pool.request()
                 .input("idPedido", sql.UniqueIdentifier, idPedido)
-                .input("idCliente", sql.UniqueIdentifier, idCliente)
-                .input("tipoEntregaPedido", sql.VarChar(7), tipoEntregaPedido)
-                .input("valorDistanciaEntrega", sql.Decimal(10,2), valorDistanciaEntrega)
-                .input("valorPesoEntrega", sql.Decimal(10,2), valorPesoEntrega)
-                .input("descontoEntrega", sql.Decimal(10,2), descontoEntrega)
-                .input("acrescimoEntrega", sql.Decimal(10,2), acrescimoEntrega)
-                .input("taxaExtraEntrega", sql.Decimal(10,2), taxaExtraEntrega)
-                .input("valorFinalEntrega", sql.Decimal(10,2), valorFinalEntrega)
+                .input("valorDistanciaEntrega", sql.Decimal(10, 2), valorDistanciaEntrega)
+                .input("valorPesoEntrega", sql.Decimal(10, 2), valorPesoEntrega)
+                .input("descontoEntrega", sql.Decimal(10, 2), descontoEntrega)
+                .input("acrescimoEntrega", sql.Decimal(10, 2), acrescimoEntrega)
+                .input("taxaExtraEntrega", sql.Decimal(10, 2), taxaExtraEntrega)
+                .input("valorFinalEntrega", sql.Decimal(10, 2), valorFinalEntrega)
                 .input("statusEntrega", sql.VarChar(12), statusEntrega)
                 .query(querySQL)
 

@@ -254,7 +254,7 @@ const clienteModel = {
 
             const pool = await getConnection();
 
-            const querySQL = `
+            let querySQL = `
                 UPDATE Clientes
                 SET nomeCliente = @nomeCliente,
                     cpfCliente = @cpfCliente,
@@ -263,6 +263,24 @@ const clienteModel = {
                     enderecoCliente = @enderecoCliente
                 WHERE idCliente = @idCliente
             `
+            const campos = [];
+
+            campos.push("nomeCliente = @nomeCliente");
+            campos.push("cpfCliente = @cpfCliente");
+            campos.push("emailCliente = @emailCliente");
+            campos.push("telefoneCliente = @telefoneCliente")
+            campos.push("enderecoCliente = @enderecoCliente")
+
+            if (campos.length === 0) {
+                console.log("Nenhum campo para atualizar.");
+                return;
+            }
+
+            querySQL = `
+                UPDATE Clientes
+                SET ${campos.join(", ")}
+                WHERE idCliente = @idCliente
+                `;
 
             await pool.request()
                 .input('idCliente', sql.UniqueIdentifier, idCliente)    

@@ -249,10 +249,6 @@ const pedidoController = {
 
             
 
-            if (statusEntrega.toLowerCase() !== "calculado" && statusEntrega.toLowerCase() !== "em transito" && statusEntrega.toLowerCase() !== "entregue" && statusEntrega.toLowerCase() != "cancelado" && statusEntrega == undefined) {
-                return res.status(404).json({erro: "Status Inválido"})
-            }
-
             const idEntrega = pedidoAtual.idEntrega
             
 
