@@ -3,6 +3,16 @@ const { sql, getConnection } = require("../config/db")
 
 const entregaModel = {
 
+    /**
+     * Busca por todas as entregas cadastradas no banco de dados.
+     * 
+     * @async
+     * @function buscarTodos
+     * 
+     * @returns {Promise<Array>}Retorna todas as entregas existentes
+     * @throws Mostra no console e propaga o erro caso a busca falhe.
+     */
+
     buscarTodos: async () => {
         try {
             const pool = await getConnection();
@@ -33,6 +43,18 @@ const entregaModel = {
             throw error;
         }
     },
+
+    /**
+     * Busca por uma entrega em específico e seus respectivos itens
+     * 
+     * @async
+     * @function buscarUm
+     * @param {idEntrega}
+     * @returns {Promise<Array>}Retorna a entrega procurada na requisição
+     * @throws Mostra no console e propaga o erro caso a busca falhe.
+     */
+
+
     buscarUm: async (idEntrega) => {
         try {
 

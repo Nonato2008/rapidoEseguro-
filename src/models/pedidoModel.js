@@ -2,6 +2,16 @@ const { sql, getConnection } = require("../config/db")
 
 const pedidoModel = {
 
+    /**
+     * Busca por um pedido em específico e seus respectivos itens
+     * 
+     * @async
+     * @function buscarTodos
+     * 
+     * @returns {Promise<Array>}Retorna todos os pedidos
+     * @throws Mostra no console e propaga o erro caso a busca falhe.
+     */
+
     buscarTodos: async () => {
 
         try {
@@ -38,6 +48,16 @@ const pedidoModel = {
 
     },
 
+    /**
+     * Busca por um cliente em específico e seus respectivos itens
+     * 
+     * @async
+     * @function buscarUm
+     * @param {number} idPedido
+     * @returns {Promise<Array>}Retorna o pedido procurado na requisição
+     * @throws Mostra no console e propaga o erro caso a busca falhe.
+     */
+
     buscarUm: async (idPedido) => {
         try {
 
@@ -56,6 +76,32 @@ const pedidoModel = {
             throw error;
         }
     },
+
+    /**
+     * Adiciona um pedido e uma entrega, com suas informações
+     * 
+     * @async
+     * @function inserirPedidos
+     * 
+     * @param {number} idCliente 
+     * @param {string} dataPedido 
+     * @param {string} tipoEntregaPedido 
+     * @param {number} distanciaPedido 
+     * @param {number} pesoPedido 
+     * @param {number} valorBaseKmPedido
+     * @param {number} valorBaseKgPedido
+     * @param {number} idPedido
+     * @param {number} valorDistanciaEntrega
+     * @param {number} valorPesoEntrega
+     * @param {number} valorFinalEntrega
+     * @param {number} acrescimoEntrega
+     * @param {number} descontoEntrega
+     * @param {number} taxaExtraEntrega
+     * @param {boolean} statusEntrega
+     * 
+     * @returns Retorna uma mensagem de sucesso na operação
+     * @throws Mostra no console e propaga o erro caso a busca falhe.
+     */
 
     inserirPedidos: async (idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido, valorDistanciaEntrega, valorPesoEntrega, valorFinalEntrega, acrescimoEntrega, descontoEntrega, taxaExtraEntrega, statusEntrega) => {
 
@@ -130,6 +176,32 @@ const pedidoModel = {
         }
     },
 
+    /**
+     * Atualiza um pedido e uma entrega existente
+     * 
+     * @async
+     * @function atualizarPedido
+     * 
+     * @param {number} idCliente 
+     * @param {string} dataPedido 
+     * @param {string} tipoEntregaPedido 
+     * @param {number} distanciaPedido 
+     * @param {number} pesoPedido 
+     * @param {number} valorBaseKmPedido
+     * @param {number} valorBaseKgPedido
+     * @param {number} idPedido
+     * @param {number} valorDistanciaEntrega
+     * @param {number} valorPesoEntrega
+     * @param {number} valorFinalEntrega
+     * @param {number} acrescimoEntrega
+     * @param {number} descontoEntrega
+     * @param {number} taxaExtraEntrega
+     * @param {boolean} statusEntrega
+     * 
+     * @returns Retorna uma mensagem de que a atualização foi sucedida com sucesso
+     * @throws Mostra no console e propaga o erro caso a busca falhe.
+     */
+
     atualizarPedido: async (idPedido, idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido, valorDistanciaEntrega, valorPesoEntrega, descontoEntrega, acrescimoEntrega, taxaExtraEntrega, valorFinalEntrega, statusEntrega ) => {
 
         try {
@@ -191,6 +263,18 @@ const pedidoModel = {
         }
 
     },
+
+    /**
+     * Deleta um pedido e uma entrega existente
+     * 
+     * @async
+     * @function deletarPedido
+     * 
+     * @param {number} idPedido
+     * 
+     * @returns Retorna uma mensagem de que a exclusão foi sucedida com sucesso
+     * @throws Mostra no console e propaga o erro caso a busca falhe.
+     */
 
     deletarPedido: async (idPedido) => {
 

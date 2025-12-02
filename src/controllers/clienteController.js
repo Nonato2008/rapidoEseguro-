@@ -12,8 +12,10 @@ const clienteController = {
      * @function criarCliente
      * @param {object} req Objeto da requisição (recebido do cliente HTTP)
      * @param {object} res Objeto da resposta (enviado ao cliente HTTP)
+     
      * @returns {Promise<void>} Retorna uma resposta JSON de que o cliente foi inserido com sucesso.
-     * @returns 
+     * @throws Mostra no console e retorna erro 500 se ocorrer falha ao criar os clientes.
+     * 
      */
 
     criarCliente: async (req, res) => {
@@ -65,6 +67,8 @@ const clienteController = {
 
             console.error('Erro ao cadastrar cliente:', error);
             res.status(500).json({ erro: 'Erro no servidor ao cadastrar cliente!' });
+            throw error;
+
 
         }
 
@@ -101,9 +105,22 @@ const clienteController = {
         } catch (error) {
             console.error("Erro ao listar clientes", error);
             res.status(500).json({ message: 'Erro ao buscar clientes' });
+            throw error;
 
         }
     },
+
+    /**
+     * Controlador que deleta clientes
+     * 
+     * @async
+     * @function deletarCliente
+     * @param {object} req Objeto da requisição (recebido do cliente HTTP)
+     * @param {object} res Objeto da resposta (enviado ao cliente HTTP)
+     * @returns {Promise<void>} Retorna uma resposta JSON de que o cliente foi deletado com sucesso.
+     * @throws Mostra no console e retorna erro 500 se ocorrer falha ao deletar o cliente.
+     * 
+     */
 
     deletarCliente: async (req, res) => {
         try {
@@ -123,7 +140,7 @@ const clienteController = {
             const entrega = await entregaModel.buscarUm(idEntrega)
 
             if(pedido.length > 0 || entrega.length > 0){
-                return res.status(409).json({message: "Entrega e pedido na conta, pague ou cancele vagabundo!!!🥚"});
+                return res.status(409).json({message: "Entrega e pedido associado ao seu id, os delete para prosseguir com a ação!"});
             }
 
             await clienteModel.deletarCliente(idCliente);
@@ -133,8 +150,21 @@ const clienteController = {
         } catch (error) {
             console.error("Erro ao deletar cliente:", error);
             res.status(500).json({ erro: "Erro interno no servidor ao deletar cliente!" });
+            throw error;
         }
     },
+
+    /**
+     * Controlador que atualiza clientes
+     * 
+     * @async
+     * @function atualizarCliente
+     * @param {object} req Objeto da requisição (recebido do cliente HTTP)
+     * @param {object} res Objeto da resposta (enviado ao cliente HTTP)
+     * @returns {Promise<void>} Retorna uma resposta JSON de que o cliente foi atualizado com sucesso.
+     * @throws Mostra no console e retorna erro 500 se ocorrer falha ao atualizar o cliente.
+     * 
+     */
 
     atualizarCliente: async (req, res) => {
         try {
@@ -178,6 +208,8 @@ const clienteController = {
         } catch (error) {
             console.error("Erro ao atualizar cliente:", error);
             res.status(500).json({ erro: "Erro interno no servidor ao atualizar cliente!" });
+            throw error;
+            
         }
     }
 }

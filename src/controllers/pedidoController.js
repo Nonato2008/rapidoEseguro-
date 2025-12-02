@@ -3,6 +3,17 @@ const { clienteModel } = require("../models/clienteModel")
 
 const pedidoController = {
 
+    /**
+     * Controlador que lista todos os pedidos do banco de dados.
+     * 
+     * @async
+     * @function listarPedidos
+     * @param {objetct} req - Objeto da requisição (recebido do pedido HTTP)
+     * @param {object} res - Objeto da resposta (enviado ao pedido HTTP)
+     * @returns {Promise<void>} Retorna uma resposta JSON com a lista de pedidos.
+     * @throws Mostra no console e retorna erro 500 se ocorrer falha ao buscar os pedidos.
+     */
+
     listarPedidos: async (req, res) => {
 
         try {
@@ -26,10 +37,22 @@ const pedidoController = {
 
             console.error("Erro ao listar pedidos", error);
             res.status(500).json({message: 'Erro interno no servidor ao listar pedidos'});        
+            throw error;
             
         }
 
     },
+
+    /**
+     * Controlador que cria novos pedidos e entregas
+     * 
+     * @async
+     * @function criarPedido
+     * @param {object} req Objeto da requisição (recebido do pedido HTTP, e entrega HTTP)
+     * @param {object} res Objeto da resposta (enviado ao pedido HTTP, e entrega HTTP)
+     * @returns {Promise<void>} Retorna uma resposta JSON de que o pedido e a entrega foi inserido com sucesso.
+     * @throws Mostra no console e retorna erro 500 se ocorrer falha ao criar o pedido e a respectiva entrega.
+     */
 
     criarPedido: async (req, res) => {
         
@@ -125,9 +148,21 @@ const pedidoController = {
         }catch (error) {
             console.error("Erro ao cadastrar pedido:", error)
             res.status(500).json({message: "Erro interno no servidor ao cadastrar pedido!"});
+            throw error;
         }
 
     },
+
+    /**
+     * Controlador que atualiza pedidos e entregas
+     * 
+     * @async
+     * @function atualizarPedido
+     * @param {object} req Objeto da requisição (recebido do pedido HTTP, e entrega HTTP)
+     * @param {object} res Objeto da resposta (enviado ao pedido HTTP, e entrega HTTP)
+     * @returns {Promise<void>} Retorna uma resposta JSON de que o pedido e a entrega foram atualizados com sucesso.
+     * @throws Mostra no console e retorna erro 500 se ocorrer falha ao criar o pedido e a respectiva entrega.
+     */
 
    atualizarPedido: async (req, res) => {
         try {
@@ -227,9 +262,21 @@ const pedidoController = {
 
         } catch (error) {
             console.error("Erro ao atualizar pedido:", error)
-            res.status(500).json({message: "Erro interno no servidor ao atualizar pedido e entrga!"});
+            res.status(500).json({message: "Erro interno no servidor ao atualizar pedido e entrega!"});
+            throw error;
         }
    },
+
+   /**
+     * Controlador que deleta pedidos e entregas
+     * 
+     * @async
+     * @function deletarPedido
+     * @param {object} req Objeto da requisição (recebido do pedido HTTP, e entrega HTTP)
+     * @param {object} res Objeto da resposta (enviado ao pedido HTTP, e entrega HTTP)
+     * @returns {Promise<void>} Retorna uma resposta JSON de que o pedido e a entrega foram deletados com sucesso.
+     * @throws Mostra no console e retorna erro 500 se ocorrer falha ao criar o pedido e a respectiva entrega.
+     */
 
    deletarPedido: async (req, res) => {
         try {
@@ -252,6 +299,7 @@ const pedidoController = {
         } catch (error) {
             console.error("Erro ao deletar pedido:", error);
             return res.status(500).json({ erro: "Erro interno no servidor ao deletar pedido!" });
+            throw error;
         }
     }
 }
