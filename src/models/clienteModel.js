@@ -41,7 +41,7 @@ const clienteModel = {
 
     buscarUm: async (idCliente) =>{
         try {
-            const pool = await getConnection();
+            const pool/* cria um conjunto de conexões */ = await getConnection();//cria conexão com o BD
 
             const querySQL = `SELECT * FROM  Clientes WHERE idCliente = @idCliente`;
 
@@ -53,7 +53,7 @@ const clienteModel = {
             return result.recordset;
         } catch (error) {
             console.error (`Erro ao bucar o cliente`, error)
-            throw error;
+            throw error;// PASSA O ERRO PARA O CONTROLLER TRATAR
         }
     },
 
@@ -226,7 +226,7 @@ const clienteModel = {
 
             await transaction.commit();
         } catch (error) {
-            await transaction.rollback();
+            await transaction.rollback()// DESFAZ TUDO CASO DÊ ERRO
             console.error("Erro ao deletar cliente:", error);
             throw error;
         }

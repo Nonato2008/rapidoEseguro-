@@ -16,7 +16,7 @@ const pedidoModel = {
 
         try {
 
-            const pool = await getConnection();
+            const pool = await getConnection(); //CRIA CONEXÃO COM BD
 
             const querySQL = `
             SELECT 
@@ -42,7 +42,7 @@ const pedidoModel = {
         } catch (error) {
 
             console.error("Erro ao buscar pedidos", error);
-            throw error;
+            throw error; // PASSA O ERRO PARA O CONTROLLER TRATAR
 
         }
 
@@ -108,7 +108,7 @@ const pedidoModel = {
         const pool = await getConnection();
 
         const transaction = new sql.Transaction(pool);
-        await transaction.begin();
+        await transaction.begin();//INICIA A TRANSAÇÃO
 
         try {
 
@@ -168,9 +168,9 @@ const pedidoModel = {
 
 
 
-            await transaction.commit();
+            await transaction.commit();// CONFIRMA A TRANSAÇÃO APÓS INSERÇÕES BEM SUCEDIDAS
         } catch (error) {
-            await transaction.rollback();
+            await transaction.rollback(); // DESFAZ TUDO CASO DÊ ERRO
             console.error("Erro ao inserir pedidoe e entrega", error)
             throw error;
         }

@@ -15,7 +15,7 @@ const entregaModel = {
 
     buscarTodos: async () => {
         try {
-            const pool = await getConnection();
+            const pool /*CRIA CONEXÃO COM O BANCO DE DADOS*/  = await getConnection();
 
             const querySQL = `
             SELECT 
@@ -40,7 +40,7 @@ const entregaModel = {
         } catch (error) {
 
             console.error("Erro ao buscar pedidos", error);
-            throw error;
+            throw error;// PASSA O ERRO PARA O CONTROLLER TRATAR
         }
     },
 
