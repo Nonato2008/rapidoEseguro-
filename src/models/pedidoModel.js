@@ -1,3 +1,4 @@
+const { request } = require("express");
 const { sql, getConnection } = require("../config/db")
 
 const pedidoModel = {
@@ -75,7 +76,37 @@ const pedidoModel = {
             console.error("Erro ao buscar pedidos", error);
             throw error;
         }
+
+        /**
+         * Busca por um cliente em específico e seus respectivos itens
+         * 
+         * @async
+         * @function buscarUmCliente
+         * 
+         * @returns {Promise<Array>}Retorna o cliente procurado na requisição
+         * @throws Mostra no console e propaga o erro caso a busca falhe.
+         */
+
     },
+
+    buscarUmCliente: async (idCliente) => {
+        try {
+            const pool/* cria um conjunto de conexões */ = await getConnection();//cria conexão com o BD
+
+            const querySQL = `SELECT * FROM  Clientes WHERE idCliente = @idCliente`;
+
+            const result = await pool
+                .request()
+                .input('idCliente', sql.UniqueIdentifier, idCliente)
+                .query(querySQL);
+
+            return result.recordset;
+        } catch (error) {
+            console.error(`Erro ao bucar o cliente`, error)
+            throw error;// PASSA O ERRO PARA O CONTROLLER TRATAR
+        }
+    },
+
 
     /**
      * Adiciona um pedido e uma entrega, com suas informações
@@ -202,84 +233,82 @@ const pedidoModel = {
      * @throws Mostra no console e propaga o erro caso a busca falhe.
      */
 
-    atualizarPedido: async (idPedido, idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido, valorDistanciaEntrega, valorPesoEntrega, descontoEntrega, acrescimoEntrega, taxaExtraEntrega, valorFinalEntrega, statusEntrega) => {
+    atualizarPedido: async (
+    idPedido,
+    idCliente,
+    dataPedido,
+    tipoEntregaPedido,
+    distanciaPedido,
+    pesoPedido,
+    valorBaseKmPedido,
+    valorBaseKgPedido,
+    valorDistanciaEntrega,
+    valorPesoEntrega,
+    descontoEntrega,
+    acrescimoEntrega,
+    taxaExtraEntrega,
+    valorFinalEntrega,
+    statusEntrega
+) => {
+    try {
+        const pool = await getConnection();
 
-        try {
-            const pool = await getConnection();
+        // Atualiza PEDIDOS
+        const queryPedidos = `
+            UPDATE PEDIDOS
+            SET
+                idCliente = @idCliente,
+                dataPedido = @dataPedido,
+                tipoEntregaPedido = @tipoEntregaPedido,
+                distanciaPedido = @distanciaPedido,
+                pesoPedido = @pesoPedido,
+                valorBaseKmPedido = @valorBaseKmPedido,
+                valorBaseKgPedido = @valorBaseKgPedido
+            WHERE idPedido = @idPedido
+        `;
+        await pool.request()
+            .input("idPedido", sql.UniqueIdentifier, idPedido)
+            .input("idCliente", sql.UniqueIdentifier, idCliente)
+            .input("dataPedido", sql.Date, dataPedido)
+            .input("tipoEntregaPedido", sql.VarChar(20), tipoEntregaPedido)
+            .input("distanciaPedido", sql.Int, distanciaPedido)
+            .input("pesoPedido", sql.Int, pesoPedido)
+            .input("valorBaseKmPedido", sql.Decimal(10, 2), valorBaseKmPedido)
+            .input("valorBaseKgPedido", sql.Decimal(10, 2), valorBaseKgPedido)
+            .query(queryPedidos);
 
-         
-            const campos = [];
+        // Atualiza ENTREGAS
+        const queryEntregas = `
+            UPDATE ENTREGAS
+            SET
+                valorDistanciaEntrega = @valorDistanciaEntrega,
+                valorPesoEntrega = @valorPesoEntrega,
+                descontoEntrega = @descontoEntrega,
+                acrescimoEntrega = @acrescimoEntrega,
+                taxaExtraEntrega = @taxaExtraEntrega,
+                valorFinalEntrega = @valorFinalEntrega,
+                statusEntrega = @statusEntrega
+            WHERE idEntrega = @idPedido
+        `;
+        await pool.request()
+            .input("idPedido", sql.UniqueIdentifier, idPedido)
+            .input("valorDistanciaEntrega", sql.Decimal(10, 2), valorDistanciaEntrega)
+            .input("valorPesoEntrega", sql.Decimal(10, 2), valorPesoEntrega)
+            .input("descontoEntrega", sql.Decimal(10, 2), descontoEntrega)
+            .input("acrescimoEntrega", sql.Decimal(10, 2), acrescimoEntrega)
+            .input("taxaExtraEntrega", sql.Decimal(10, 2), taxaExtraEntrega)
+            .input("valorFinalEntrega", sql.Decimal(10, 2), valorFinalEntrega)
+            .input("statusEntrega", sql.VarChar(20), statusEntrega)
+            .query(queryEntregas);
 
-            campos.push("idCliente = @idCliente")
-            campos.push("dataPedido = @dataPedido")
-            campos.push("tipoEntregaPedido = @tipoEntregaPedido")
-            campos.push("distanciaPedido = @distanciaPedido")
-            campos.push("pesoPedido = @pesoPedido")
-            campos.push("valorBaseKmPedido = @valorBaseKmPedido")
-            campos.push("valorBaseKgPedido = @valorBaseKgPedido")
+    } catch (error) {
+        console.error("Erro ao atualizar pedido", error);
+        throw error;
+    }
+},
 
-            if (campos.length === 0) {
-                console.log("Nenhum campo para atualizar.");
-                return;
-            }
 
-            let querySQL = `
-                UPDATE Pedidos
-                SET ${campos.join(", ")}
-                WHERE idPedido = @idPedido
-                `;
 
-            await pool.request()
-
-                .input("idPedido", sql.UniqueIdentifier, idPedido)
-                .input("idCliente", sql.UniqueIdentifier, idCliente)
-                .input("dataPedido", sql.Date, dataPedido)
-                .input("tipoEntregaPedido", sql.VarChar(7), tipoEntregaPedido)
-                .input("distanciaPedido", sql.Int, distanciaPedido)
-                .input("pesoPedido", sql.Int, pesoPedido)
-                .input("valorBaseKmPedido", sql.Decimal(10, 2), valorBaseKmPedido)
-                .input("valorBaseKgPedido", sql.Decimal(10, 2), valorBaseKgPedido)
-                .query(querySQL)
-
-            
-            const entregaCampos = [];
-
-            entregaCampos.push("valorDistanciaEntrega = @valorDistanciaEntrega")
-            entregaCampos.push("valorPesoEntrega = @valorPesoEntrega")
-            entregaCampos.push("descontoEntrega = @descontoEntrega")
-            entregaCampos.push("acrescimoEntrega = @acrescimoEntrega")
-            entregaCampos.push("taxaExtraEntrega = @taxaExtraEntrega")
-            entregaCampos.push("valorFinalEntrega = @valorFinalEntrega")
-            entregaCampos.push("statusEntrega = @statusEntrega")
-
-            if (entregaCampos.length === 0) {
-                console.log("Nenhum campo para atualizar.");
-                return;
-            }
-
-            querySQL = `
-                UPDATE ENTREGAS
-                SET ${entregaCampos.join(", ")}
-                WHERE idPedido = @idPedido
-                `;
-
-            await pool.request()
-                .input("idPedido", sql.UniqueIdentifier, idPedido)
-                .input("valorDistanciaEntrega", sql.Decimal(10, 2), valorDistanciaEntrega)
-                .input("valorPesoEntrega", sql.Decimal(10, 2), valorPesoEntrega)
-                .input("descontoEntrega", sql.Decimal(10, 2), descontoEntrega)
-                .input("acrescimoEntrega", sql.Decimal(10, 2), acrescimoEntrega)
-                .input("taxaExtraEntrega", sql.Decimal(10, 2), taxaExtraEntrega)
-                .input("valorFinalEntrega", sql.Decimal(10, 2), valorFinalEntrega)
-                .input("statusEntrega", sql.VarChar(12), statusEntrega)
-                .query(querySQL)
-
-        } catch (error) {
-            console.error("Erro ao atualizar pedido", error)
-            throw error;
-        }
-
-    },
 
     /**
      * Deleta um pedido e uma entrega existente

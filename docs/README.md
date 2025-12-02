@@ -6,6 +6,7 @@
 
 - **Descrição**: Obtém uma lista de clientes
 - **Response**: Array de clientes
+-**Fillter**: Array de um cliente
 
 #### POST /clientes
 

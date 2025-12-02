@@ -50,12 +50,7 @@ const clienteController = {
             if (!isNaN(nomeCliente)) {
                 return res.status(409).json({ message: "Insira um nome válido" });
             }
-
-            // VERIFICAR SE O TELEFONE INFORMADO JÁ ESTÁ INSERIDO 
-            const resultTelf = await clienteModel.verificarTelefone(telefoneCliente);
-            if (resultTelf.length > 0) {
-                return res.status(409).json({ erro: "Número já existente!" });
-            }
+        
 
             // VERIFICAR SE O EMAIL INFORMADO JÁ ESTÁ INSERIDO
             const resultEmail = await clienteModel.verificarEmail(emailCliente);
@@ -147,10 +142,10 @@ const clienteController = {
             }
 
             // VERIFICAÇÃO SE O ID TEM ALGUM PEDIDO E ENTREGA ASSOCIADO ANTES DE PERMITIR O DELETAR
-            const pedido = await pedidoModel.buscarUm(idPedido)
-            const entrega = await entregaModel.buscarUm(idEntrega)
+            const pedido = await pedidoModel.buscarUmCliente(idCliente)
 
-            if(pedido.length > 0 || entrega.length > 0){
+
+            if(pedido.length > 0){
                 return res.status(409).json({message: "Entrega e pedido associado ao seu id, os delete para prosseguir com a ação!"});
             }
 
