@@ -21,6 +21,7 @@ const entregaController = {
         try {
             const { idEntrega } = req.query;
 
+            //VIFICA A VALIDEZ DO ID DA ENTREGA
             if (idEntrega) {
                 if (idEntrega.length != 36) {
                     return res.status(400).json({ erro: "id da entrega inválida" })
@@ -30,6 +31,7 @@ const entregaController = {
                 return res.status(200).json(entrega)
             }
 
+
             const entregas = await entregaModel.buscarTodos();
 
 
@@ -38,7 +40,7 @@ const entregaController = {
         } catch (error) {
             console.error("Erro ao listar entregas:", error);
             res.status(500).json({ erro: "Erro interno no servidor ao listar entregas!" });
-            throw error;
+            throw error;// PASSA O ERRO PARA O  CONTROLE TRATAR
         }
     }
 }

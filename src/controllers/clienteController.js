@@ -24,54 +24,56 @@ const clienteController = {
 
             const { nomeCliente, cpfCliente, emailCliente, telefoneCliente, enderecoCliente } = req.body
 
+
+            // SISTEMA DE VERIFICAÇÃO DOS DADOS
             if (nomeCliente == undefined || cpfCliente == undefined || emailCliente == undefined || telefoneCliente == undefined || enderecoCliente == undefined) {
                 return res.status(400).json({ erro: 'Campos obrigatórios não preenchidos!' });
             }
 
+            //CÓDIGO PARA VERIFICAR SE O CPF JÁ EXISTE
             const result = await clienteModel.verificarCPF(cpfCliente);
-
             if (result.length > 0) {
                 return res.status(409).json({ message: "CPF Existente" });
             }
 
+            // VERIFICAR SE O CPF INSERIDO É VÁLIDO OU NÃO
             if (cpfCliente.length < 11 || cpfCliente.length > 11) {
                 return res.status(409).json({ message: "CPF Inválido" });
             }
 
+            // VERIFICAR SE O EMAIL INFORMADO TEM @
             if (!emailCliente.includes("@")) {
                 return res.status(409).json({ message: "Email deve ter @" });
             }
 
+            // VERIFICAR SE HÁ NÚMERO NO NOME INFORMADO
             if (!isNaN(nomeCliente)) {
                 return res.status(409).json({ message: "Insira um nome válido" });
             }
 
+            // VERIFICAR SE O TELEFONE INFORMADO JÁ ESTÁ INSERIDO 
             const resultTelf = await clienteModel.verificarTelefone(telefoneCliente);
-
             if (resultTelf.length > 0) {
                 return res.status(409).json({ erro: "Número já existente!" });
             }
 
-            if(nomeCliente == " " || cpfCliente == " " || emailCliente == " " || telefoneCliente == " " || enderecoCliente == " " ){
-                return res.status(409).json({ erro: "Por favor preencha os campos" });
-            }
-
+            // VERIFICAR SE O EMAIL INFORMADO JÁ ESTÁ INSERIDO
             const resultEmail = await clienteModel.verificarEmail(emailCliente);
-
             if (resultEmail.length > 0) {
                 return res.status(409).json({ erro: "Email já existente!" });
             }
 
-
             await clienteModel.inserirCliente(nomeCliente, cpfCliente, emailCliente, telefoneCliente, enderecoCliente);
 
+            //MENSAGEM DE SUCESSO \/
             res.status(201).json({ message: 'Sua conta foi cadastrada com sucesso!' });
 
         } catch (error) {
 
+            //MENSAGEM DE ERRO 
             console.error('Erro ao cadastrar cliente:', error);
             res.status(500).json({ erro: 'Erro no servidor ao cadastrar cliente!' });
-            throw error;
+            throw error; // PASSA O ERRO PARA O CONTROLLER TRATAR E MOSTRA NO CONSOLE
 
 
         }
@@ -93,6 +95,7 @@ const clienteController = {
         try {
             const { idCliente } = req.query;
 
+            // VERIFICAR SE O ID EXISTE E SE ELE É VÁLIDO
             if (idCliente) {
                 if (idCliente.length != 36) {
                     return res.status(400).json({ erro: "id do cliente inválido" });
@@ -103,13 +106,15 @@ const clienteController = {
                 return res.status(200).json(cliente)
             }
 
+            // LISTAR TODOS OS CLIENTES
             const clientes = await clienteModel.buscarTodos();
 
             res.status(200).json(clientes)
         } catch (error) {
+            //MENSAGEM DE ERRO \/
             console.error("Erro ao listar clientes", error);
             res.status(500).json({ message: 'Erro ao buscar clientes' });
-            throw error;
+            throw error;// PASSA O ERRO PARA O CONTROLLER TRATAR
 
         }
     },
@@ -130,16 +135,18 @@ const clienteController = {
         try {
             const { idCliente, idPedido, idEntrega } = req.params;
 
+            //VERIFICA A VALIDEZ DO ID
             if (idCliente.length != 36) {
                 return res.status(400).json({ erro: "id do cliente inválido" });
             }
 
+            //BUSCA PELO CLIENTE INFORMADO SE ELE EXISTE NO DB
             const cliente = await clienteModel.buscarUm(idCliente);
-
             if (!cliente || cliente.length !== 1) {
                 return res.status(400).json({ erro: "Cliente não encontrado!" });
             }
 
+            // VERIFICAÇÃO SE O ID TEM ALGUM PEDIDO E ENTREGA ASSOCIADO ANTES DE PERMITIR O DELETAR
             const pedido = await pedidoModel.buscarUm(idPedido)
             const entrega = await entregaModel.buscarUm(idEntrega)
 
@@ -149,12 +156,13 @@ const clienteController = {
 
             await clienteModel.deletarCliente(idCliente);
 
+            //MENSSAGEM DE SUCESSO \/
             res.status(200).json({ mensagem: "Cliente deletado com sucesso!" });
 
         } catch (error) {
             console.error("Erro ao deletar cliente:", error);
             res.status(500).json({ erro: "Erro interno no servidor ao deletar cliente!" });
-            throw error;
+            throw error;// PASSA O ERRO PARA O CONTROLLER TRATAR
         }
     },
 
@@ -175,12 +183,13 @@ const clienteController = {
             const { idCliente } = req.params;
             const { nomeCliente, cpfCliente, emailCliente, telefoneCliente, enderecoCliente } = req.body;
 
+            // VERIFICAR A VALIDEZ DO ID
             if (idCliente.length != 36) {
                 return res.status(400).json({ erro: 'id do cliente invalido' })
             }
 
-            const cliente = await clienteModel.buscarUm(idCliente);
-
+            //BUSCA PELA EXISTÊNCIA DO ID DO CLIENTE
+            const cliente = await clienteModel.buscarUm(idCliente)
             if (!cliente || cliente.length != 1) {
                 return res.status(404).json({ erro: 'Cliente não encontrado!' })
             }
@@ -194,12 +203,14 @@ const clienteController = {
             const telefoneClienteAtualizado = telefoneCliente ?? clienteAtual.telefoneCliente;
             const enderecoClienteAtualizado = enderecoCliente ?? clienteAtual.enderecoCliente;
 
+            //VERIFICAR A VALIDEZ DA EXISÊNCIA DO CPF 
             const resultCpf = await clienteModel.verificarCPF(cpfClienteAtualizado);
 
             if (resultCpf.length > 0 && resultCpf[0].idCliente !== idCliente) {
                 return res.status(409).json({ erro: "CPF já existente!" });
             }
 
+            //VERIFICA SE O TELEFONE INFORMADO JÁ EXISTE 
             const resultTelf = await clienteModel.verificarTelefone(telefoneClienteAtualizado);
 
             if (resultTelf.length > 0 && resultTelf[0].idCliente !== idCliente) {
@@ -208,12 +219,13 @@ const clienteController = {
 
             await clienteModel.atualizarCliente(idCliente, nomeClienteAtualizado, cpfClienteAtualizado, emailClienteAtualizado, telefoneClienteAtualizado, enderecoClienteAtualizado);
 
+            //MENSSAGEM DE SUCESSO
             res.status(200).json({ mensagem: "Cliente atualizado com sucesso!"});
 
         } catch (error) {
             console.error("Erro ao atualizar cliente:", error);
             res.status(500).json({ erro: "Erro interno no servidor ao atualizar cliente!" });
-            throw error;
+            throw error;// PASSA O ERRO PARA O CONTROLLER TRATAR
             
         }
     }

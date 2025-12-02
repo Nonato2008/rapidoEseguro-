@@ -20,6 +20,7 @@ const pedidoController = {
 
             const { idPedido } = req.query;
 
+            // VERIFICA A VALIDEZ DO ID DO PEDIDO
             if(idPedido){
                 if ( idPedido.length != 36 ){
                     return res.status(400).json({ erro: "id do pedido inválido"})
@@ -37,7 +38,7 @@ const pedidoController = {
 
             console.error("Erro ao listar pedidos", error);
             res.status(500).json({message: 'Erro interno no servidor ao listar pedidos'});        
-            throw error;
+            throw error;// PASSA O ERRO PARA O CONTROLLER TRATAR
             
         }
 
@@ -70,30 +71,35 @@ const pedidoController = {
 
  
 
+            // VERIFICA SE OS CAMPOS FORAM PREENCHIDOS
             if(idCliente == undefined || dataPedido == undefined || tipoEntregaPedido == undefined || distanciaPedido == undefined || pesoPedido == undefined || valorBaseKmPedido == undefined || valorBaseKgPedido == undefined){
                 return res.status(400).json({erro: "Campos obrigatórios não preenchidos"})
             }
 
+            //VERIFICA SE TEM LETRA NOS CAMPOS ABAIXO
             if ( isNaN(distanciaPedido) || isNaN(pesoPedido) || isNaN(valorBaseKmPedido) || isNaN(valorBaseKgPedido)  ) {
                 return res.status(400).json({erro: "Campos preenchidos incorretamente"})
             }
 
+            // VEFICA A VALIDEZ DO ID DO CLIENTE
             if(idCliente.length != 36 ){
                 return res.status(400).json({erro: "Id do Cliente inválido"})
             }
             
+            // VERIFICA A VALIDEZ DA DATA
             const data = new Date(dataPedido);
             if(isNaN(data.getTime())){
                 return res.status(400).json({erro: "Data do pedido inválida"})
             }
-            
-            const cliente = await clienteModel.buscarUm(idCliente); 
 
+
+            // BUSCA PELO CLIENTE E SE ELE EXISTE
+            const cliente = await clienteModel.buscarUm(idCliente); 
             if(!cliente || cliente.length != 1){
                 return res.status(404).json({erro: "Cliente não encontrado"})
             }  
 
-        
+            // CÁLCULOS DA ENTREGA
             let valorDistanciaEntrega = distanciaPedido * valorBaseKmPedido
 
             let valorPesoEntrega = pesoPedido * valorBaseKgPedido
@@ -102,22 +108,25 @@ const pedidoController = {
 
             let  acrescimoEntrega = 0
 
-            let taxaExtraEntrega = 15
+            let taxaExtraEntrega = 0
 
             let descontoEntrega = 0 
 
            
 
-            
+            // SE A ENTREGA FOR UREGENTE TEM UM ACRÉSCIMO DE 20%
             if(tipoEntregaPedido == "urgente".toLowerCase()){
                acrescimoEntrega = (valorFinalEntrega * 0.2)
 
                 valorFinalEntrega = valorFinalEntrega + acrescimoEntrega
                 
+                // SE O PESO FOR MAIOR QUE 50 ADICIONASSE A TXA DE 15 
                 if(pesoPedido > 50){
+                taxaExtraEntrega = taxaExtraEntrega + 15    
+                
                  valorFinalEntrega = valorFinalEntrega + taxaExtraEntrega
             }
-
+                // se o valor final passar de 500 tem um desconto de 10%
                 if(valorFinalEntrega > 500){
                 descontoEntrega = (valorFinalEntrega * 0.1)
 
@@ -125,13 +134,16 @@ const pedidoController = {
             }
             } 
 
+            // se o valor final passar de 500 tem um desconto de 10%
             if(valorFinalEntrega > 500){
                 descontoEntrega = (valorFinalEntrega * 0.1)
 
                 valorFinalEntrega = descontoEntrega
             }
 
+            // SE O PESO FOR MAIOR QUE 50 ADICIONASSE A TAXA DE 15 
             if(pesoPedido > 50){
+                taxaExtraEntrega = taxaExtraEntrega + 15
                 valorFinalEntrega = valorFinalEntrega + taxaExtraEntrega
             }
 
@@ -169,16 +181,20 @@ const pedidoController = {
             const {idPedido} = req.params;
             const {idCliente, dataPedido, tipoEntregaPedido, distanciaPedido, pesoPedido, valorBaseKmPedido, valorBaseKgPedido, statusEntrega} = req.body;
 
+
+            // VERIFICA A VALIDEZ DO ID 
             if(idPedido.length != 36){
                 return res.status(400).json({errp: "id do pedido inválido!"})
             }
 
+            //BUSCA PELO PEDIDO INFORMADO
             const pedido = await pedidoModel.buscarUm(idPedido);
 
             if(!pedido || pedido.length !== 1){
                 return res.status(404).json({errp: "Pedido não encontrado!`"})
             }
 
+            // BUSCA PELO ID E SUA VALIDEZ 
             if(idCliente){
                 if (idCliente.length != 36) {
                     return res.status(400).json({erro: "id do cliente inválido!"})
@@ -186,6 +202,7 @@ const pedidoController = {
 
                 const cliente = await clienteModel.buscarUm(idCliente);
 
+                // PROCURA PELO CLIENTE
                 if(!cliente || cliente.length !== 1){
                     return res.status(404).json({erro: "Cliente não encontrado!"})
                 }
@@ -204,6 +221,7 @@ const pedidoController = {
 
             //ATUALIZAR ENTREGA
 
+            // CÁLCULO DA ENTREGA
             valorDistanciaEntrega = distanciaPedido * valorBaseKmPedido
 
             valorPesoEntrega = pesoPedido * valorBaseKgPedido
@@ -218,16 +236,19 @@ const pedidoController = {
 
            
 
-            
+            // SE A ENTREGA FOR UREGENTE TEM UM ACRÉSCIMO DE 20%
             if(tipoEntregaPedido == "urgente".toLowerCase()){
                acrescimoEntrega = (valorFinalEntrega * 0.2)
 
                 valorFinalEntrega = valorFinalEntrega + acrescimoEntrega
                 
+                // SE O PESO FOR MAIOR QUE 50 ADICIONASSE A TXA DE 15
                 if(pesoPedido > 50){
+                taxaExtraEntrega = taxaExtraEntrega + 15    
                  valorFinalEntrega = valorFinalEntrega + taxaExtraEntrega
             }
 
+            // se o valor final passar de 500 tem um desconto de 10%
                 if(valorFinalEntrega > 500){
                 descontoEntrega = (valorFinalEntrega * 0.1)
 
@@ -235,12 +256,14 @@ const pedidoController = {
             }
             } 
 
+            // se o valor final passar de 500 tem um desconto de 10%
             if(valorFinalEntrega > 500){
                 descontoEntrega = (valorFinalEntrega * 0.1)
 
                 valorFinalEntrega = descontoEntrega
             }
 
+            // SE O PESO FOR MAIOR QUE 50 ADICIONASSE A TXA DE 15 
             if(pesoPedido > 50){
 
                 taxaExtraEntrega = taxaExtraEntrega + 15
@@ -278,12 +301,13 @@ const pedidoController = {
         try {
             const { idPedido } = req.params;
 
+            // VERIFICA A VALIDEZ DO ID
             if (!idPedido || idPedido.length !== 36) {
                 return res.status(400).json({ erro: "ID do pedido inválido!" });
             }
 
+            // BUSCA PELO ID 
             const pedido = await pedidoModel.buscarUm(idPedido);
-    
             if (!pedido || pedido.length !== 1) {
                 return res.status(404).json({ erro: "Pedido não encontrado!" });
             }
@@ -295,7 +319,7 @@ const pedidoController = {
         } catch (error) {
             console.error("Erro ao deletar pedido:", error);
             return res.status(500).json({ erro: "Erro interno no servidor ao deletar pedido!" });
-            throw error;
+            throw error;// PASSA O ERRO PARA O CONTROLLER TRATAR
         }
     }
 }
